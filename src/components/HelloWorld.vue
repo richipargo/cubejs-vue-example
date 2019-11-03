@@ -1,19 +1,21 @@
 <template>
   <div class="hello">
     <query-builder :cubejs-api="cubejsApi" :query="query">
-      <template v-slot="{ measures, setMeasures, availableMeasures, loading, resultSet }">
+      <template v-slot:builder="{ measures, setMeasures, availableMeasures }">
         <multiselect
           :multiple="true"
           :customLabel="customLabel"
-          @input="setMeasures"
+          @input="(...args) => set(setMeasures, ...args)"
           :value="measures"
           :options="availableMeasures"
           placeholder="Please Select"
           label="Title"
           track-by="name"/>
-          <chart-renderer
-            v-if="!loading && measures.length > 0"
-            :result-set="resultSet" />
+      </template>
+      <template v-slot="{ resultSet }">
+        <chart-renderer
+          v-if="resultSet"
+          :result-set="resultSet" />
       </template>
     </query-builder>
   </div>
@@ -57,6 +59,9 @@ export default {
   methods: {
     customLabel(a) {
       return a.title;
+    },
+    set(setMeasures, value) {
+      setMeasures(value.map(e => e.name));
     },
   },
 };
